@@ -50,7 +50,10 @@ const themes = {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState(localStorage.getItem('theme') || 'mermaid');
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return themes[saved] ? saved : 'mermaid';
+  });
 
   useEffect(() => {
     localStorage.setItem('theme', currentTheme);
@@ -58,6 +61,8 @@ export const ThemeProvider = ({ children }) => {
     
     // Apply dynamic colors to CSS variables
     const theme = themes[currentTheme];
+    if (!theme) return;
+    
     document.documentElement.style.setProperty('--color-primary', theme.primary);
     document.documentElement.style.setProperty('--color-secondary', theme.secondary);
     document.documentElement.style.setProperty('--color-accent', theme.accent);
