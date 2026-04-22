@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Heart, Smartphone, Lock } from 'lucide-react';
+import { Heart, User, Lock } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 const Login = ({ onLogin }) => {
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(''); // Keep variable name same as backend expects 'phone'
   const [password, setPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
@@ -54,13 +54,13 @@ const Login = ({ onLogin }) => {
       
       <h1 className="text-3xl font-bold text-pink-600 mb-2">魔法认字卡</h1>
       <p className="text-pink-400 mb-8">开启小朋友的识字旅程</p>
-
+-
       <form onSubmit={handleSubmit} className="w-full space-y-4">
         <div className="relative">
-          <Smartphone className="absolute left-4 top-3.5 w-5 h-5 text-pink-300" />
+          <User className="absolute left-4 top-3.5 w-5 h-5 text-pink-300" />
           <input
             type="text"
-            placeholder="手机号码"
+            placeholder="用户名 / 手机号"
             className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-pink-100 rounded-2xl focus:border-pink-400 outline-none transition-all"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}

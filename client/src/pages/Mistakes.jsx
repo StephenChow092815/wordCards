@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { ChevronLeft, RefreshCw, Star, Trash2, Snowflake } from 'lucide-react';
+import { ChevronLeft, RefreshCw, Star, Trash2, Snowflake, Waves, Ghost, Sparkles } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const Mistakes = () => {
@@ -31,6 +31,13 @@ const Mistakes = () => {
     }
   };
 
+  const getThemeIcon = (className, style) => {
+    if (themeName === 'mermaid') return <Waves className={className} style={style} />;
+    if (themeName === 'frozen') return <Snowflake className={className} style={style} />;
+    if (themeName === 'kuromi') return <Ghost className={className} style={style} />;
+    return <Sparkles className={className} style={style} />;
+  };
+
   return (
     <div className="flex-1 flex flex-col p-6 overflow-y-auto min-h-0 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       <div className="flex items-center justify-between mb-8 flex-shrink-0">
@@ -47,11 +54,7 @@ const Mistakes = () => {
 
       <div className="bg-white rounded-[40px] p-8 mb-8 shadow-xl flex flex-col items-center flex-shrink-0" style={{ boxShadow: `0 20px 40px ${theme.primary}11` }}>
         <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: theme.secondary }}>
-          {themeName === 'magic' ? (
-            <Star className="w-10 h-10" style={{ color: theme.primary, fill: theme.primary }} />
-          ) : (
-            <Snowflake className="w-10 h-10" style={{ color: theme.primary }} />
-          )}
+          {getThemeIcon("w-10 h-10", { color: theme.primary, fill: themeName === 'frozen' ? 'none' : theme.primary })}
         </div>
         <h3 className="text-2xl font-bold text-gray-800">{mistakes.length}</h3>
         <p className="text-gray-400 text-sm">待攻克的生词</p>
@@ -98,9 +101,9 @@ const Mistakes = () => {
       {mistakes.length === 0 && !loading && (
         <div className="flex-1 flex flex-col items-center justify-center py-20 text-center">
           <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-6 shadow-inner">
-            <Star className="text-amber-200 fill-amber-200 w-16 h-16" />
+            {getThemeIcon("w-16 h-16 opacity-20", { color: theme.primary, fill: themeName === 'frozen' ? 'none' : theme.primary })}
           </div>
-          <p className="text-gray-400">哇！还没有错题哦<br/>宝贝真聪明！</p>
+          <p className="text-gray-400 font-medium">哇！还没有错题哦<br/>宝贝真聪明！</p>
         </div>
       )}
     </div>

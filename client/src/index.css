@@ -27,6 +27,8 @@ html, body, #root {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: var(--color-secondary);
+  transition: background-color 0.5s ease;
   -webkit-tap-highlight-color: transparent;
 }
 

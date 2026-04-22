@@ -36,17 +36,19 @@ const authenticate = (req, res, next) => {
 
 app.post('/api/auth/register', async (req, res) => {
   const { phone, password } = req.body;
-  if (!phone || !password) return res.status(400).json({ error: 'Missing phone or password' });
+  if (!phone || !password) return res.status(400).json({ error: '请输入用户名和密码' });
 
+  log(`Attempting to register user: ${phone}`);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const info = db.prepare('INSERT INTO users (phone, password) VALUES (?, ?)').run(phone, hashedPassword);
     res.json({ message: 'User registered', userId: info.lastInsertRowid });
   } catch (error) {
-    if (error.code === 'SQLITE_CONSTRAINT') {
-      return res.status(400).json({ error: 'Phone number already registered' });
+    console.error('Registration Error:', error);
+    if (error.code === 'SQLITE_CONSTRAINT' || error.message.includes('UNIQUE constraint failed')) {
+      return res.status(400).json({ error: '该用户名已被注册' });
     }
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: '服务器错误: ' + error.message });
   }
 });
 
@@ -55,7 +57,7 @@ app.post('/api/auth/login', async (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE phone = ?').get(phone);
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Invalid phone or password' });
+    return res.status(401).json({ error: '用户名或密码错误' });
   }
 
   const token = jwt.sign({ id: user.id, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' });
@@ -139,6 +141,40 @@ app.post('/api/cards', authenticate, (req, res) => {
 
   const cardId = transaction();
   res.json({ id: cardId });
+});
+
+app.post('/api/cards/sync', authenticate, (req, res) => {
+  try {
+    const adminId = 1;
+    if (req.user.id === adminId) {
+      return res.status(400).json({ error: '您已经是管理员，无需同步' });
+    }
+
+    // 1. 获取管理员的所有字卡
+    const adminCards = db.prepare('SELECT * FROM cards WHERE user_id = ?').all(adminId);
+    
+    // 2. 获取当前用户的所有字卡内容，用于去重
+    const userCards = db.prepare('SELECT content FROM cards WHERE user_id = ?').all(req.user.id);
+    const userContentSet = new Set(userCards.map(c => c.content));
+
+    let syncCount = 0;
+    const insertCard = db.prepare('INSERT INTO cards (user_id, tag_id, content, pinyin) VALUES (?, ?, ?, ?)');
+
+    const transaction = db.transaction(() => {
+      for (const card of adminCards) {
+        if (!userContentSet.has(card.content)) {
+          insertCard.run(req.user.id, card.tag_id, card.content, card.pinyin);
+          syncCount++;
+        }
+      }
+    });
+
+    transaction();
+    res.json({ success: true, count: syncCount });
+  } catch (error) {
+    console.error('Sync Error:', error);
+    res.status(500).json({ error: '同步失败: ' + error.message });
+  }
 });
 
 // --- Mistake Routes ---

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Star, Sparkles, Snowflake } from 'lucide-react';
+import { ChevronLeft, Star, Sparkles, Snowflake, Waves, Ghost } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const Categories = () => {
@@ -29,6 +29,20 @@ const Categories = () => {
     }
   };
 
+  const getThemeIcon = (className, style) => {
+    if (themeName === 'mermaid') return <Waves className={className} style={style} />;
+    if (themeName === 'frozen') return <Snowflake className={className} style={style} />;
+    if (themeName === 'kuromi') return <Ghost className={className} style={style} />;
+    return <Sparkles className={className} style={style} />;
+  };
+
+  const getThemeWelcome = () => {
+    if (themeName === 'mermaid') return '你想开启哪扇贝壳之门呢？';
+    if (themeName === 'frozen') return '你想开启哪一扇冰雪之门呢？';
+    if (themeName === 'kuromi') return '酷洛米大人想去哪里捣蛋呢？';
+    return '你想学习哪一类魔法卡呢？';
+  };
+
   return (
     <div className="flex-1 flex flex-col p-6 overflow-y-auto min-h-0 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       <div className="flex items-center justify-between mb-8">
@@ -45,19 +59,15 @@ const Categories = () => {
 
       <div className="flex flex-col items-center mb-8">
         <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-lg">
-          {themeName === 'magic' ? (
-            <Sparkles className="w-10 h-10" style={{ color: theme.accent }} />
-          ) : (
-            <Snowflake className="w-10 h-10 animate-spin-slow" style={{ color: theme.primary }} />
-          )}
+          {getThemeIcon("w-10 h-10", { color: theme.primary, fill: themeName === 'frozen' ? 'none' : theme.primary })}
         </div>
-        <p className="text-sm opacity-60" style={{ color: theme.primary }}>
-          {themeName === 'magic' ? '你想学习哪一类魔法卡呢？' : '你想开启哪一扇冰雪之门呢？'}
+        <p className="text-sm font-bold opacity-60" style={{ color: theme.primary }}>
+          {getThemeWelcome()}
         </p>
       </div>
 
       {loading ? (
-        <div className="text-center text-pink-500">魔法加载中...</div>
+        <div className="text-center" style={{ color: theme.primary }}>加载中...</div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
           {tags.map((tag, index) => (
@@ -73,11 +83,7 @@ const Categories = () => {
               style={{ borderColor: theme.accent + '33' }}
             >
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ backgroundColor: theme.secondary }}>
-                {themeName === 'magic' ? (
-                  <Star className="w-6 h-6" style={{ color: theme.primary, fill: theme.primary }} />
-                ) : (
-                  <Snowflake className="w-6 h-6" style={{ color: theme.primary }} />
-                )}
+                {getThemeIcon("w-6 h-6", { color: theme.primary, fill: themeName === 'frozen' ? 'none' : theme.primary })}
               </div>
               <span className="font-bold text-gray-700 text-lg">{tag}</span>
             </motion.button>
