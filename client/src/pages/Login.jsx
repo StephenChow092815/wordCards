@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Heart, Smartphone, Lock } from 'lucide-react';
@@ -10,6 +10,19 @@ const Login = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
   const showToast = useToast();
+
+  useEffect(() => {
+    // Preload theme background images
+    const images = [
+      '/themes/mermaid/bg.png',
+      '/themes/elsa/bg.png',
+      '/themes/kuromi/bg.png'
+    ];
+    images.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

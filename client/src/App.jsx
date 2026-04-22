@@ -40,7 +40,7 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
         <Router>
-          <div className="h-full max-w-md mx-auto relative bg-white shadow-xl overflow-hidden flex flex-col">
+          <div className="magic-app-container max-w-md mx-auto relative bg-white shadow-xl overflow-hidden">
             <Routes>
               <Route path="/login" element={user ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
               <Route path="/" element={user ? <Home user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />

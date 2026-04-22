@@ -30,7 +30,7 @@ const Categories = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-6 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
+    <div className="flex-1 flex flex-col p-6 overflow-y-auto min-h-0 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       <div className="flex items-center justify-between mb-8">
         <button 
           onClick={() => navigate('/')} 

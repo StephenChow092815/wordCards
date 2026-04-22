@@ -9,7 +9,7 @@ const themes = {
     name: '粉色美人鱼',
     primary: '#f472b6', // pink-400
     secondary: '#fff1f2', // rose-50
-    accent: '#2dd4bf', // teal-400
+    accent: '#fb7185', // rose-400 (softer coral)
     bg: '/themes/mermaid/bg.png',
     logo: '/themes/mermaid/logo.png',
     cardColors: [

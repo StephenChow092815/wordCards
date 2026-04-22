@@ -17,6 +17,7 @@ const Study = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     fetchCards();
@@ -45,24 +46,36 @@ const Study = () => {
   };
 
   const handleNext = async (correct) => {
-    if (!correct) {
-      markAsMistake(cards[currentIndex].id);
-    } else {
-      // 只要记住了，就尝试从错题本中移除（软删除）
-      await removeMistake(cards[currentIndex].id);
-      // 记录学习日志
-      await logStudyAction(cards[currentIndex].id);
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+
+    try {
+      if (!correct) {
+        await markAsMistake(cards[currentIndex].id);
+      } else {
+        // 只要记住了，就尝试从错题本中移除（软删除）
+        await removeMistake(cards[currentIndex].id);
+        // 记录学习日志
+        await logStudyAction(cards[currentIndex].id);
+      }
+    } catch (err) {
+      console.error('Action failed', err);
     }
 
     setIsFlipped(false);
+    
+    // Wait for exit animation to complete before moving to next card
     setTimeout(() => {
       if (currentIndex < cards.length - 1) {
         setCurrentIndex(currentIndex + 1);
+        // Add a small delay for the next card's entrance animation before re-enabling
+        setTimeout(() => setIsTransitioning(false), 300);
       } else {
         showToast('太棒了！这一组已经学完啦！', 'success');
         navigate('/');
+        setIsTransitioning(false);
       }
-    }, 300);
+    }, 400);
   };
 
   const markAsMistake = async (cardId) => {
@@ -146,33 +159,43 @@ const Study = () => {
             exit={{ x: -300, opacity: 0 }}
             transition={{ duration: 0.6, type: 'spring' }}
             onClick={() => setIsFlipped(!isFlipped)}
-            className="relative w-full aspect-[3/4] max-h-[500px] cursor-pointer preserve-3d"
+            className="relative w-full h-[60vh] max-h-[600px] cursor-pointer preserve-3d"
           >
             {/* Front Side */}
-            <div className="absolute inset-0 bg-white rounded-[40px] shadow-2xl flex flex-col items-center justify-center p-8 border-8 border-pink-100 backface-hidden">
+            <div 
+              className="absolute inset-0 bg-white rounded-[40px] shadow-2xl flex flex-col items-center justify-center p-8 border-8 backface-hidden"
+              style={{ borderColor: theme.accent + '33' }}
+            >
               <h1 className="text-8xl font-bold text-gray-800 mb-8">{currentCard.content}</h1>
-              <div className="bg-pink-50 p-4 rounded-full">
-                <Volume2 className="text-pink-400 w-8 h-8" />
+              <div className="p-4 rounded-full" style={{ backgroundColor: theme.secondary }}>
+                <Volume2 className="w-8 h-8" style={{ color: theme.primary }} />
               </div>
-              <p className="mt-8 text-gray-300 text-sm italic">点击卡片看解析</p>
+              <p className="mt-8 text-sm italic opacity-40" style={{ color: theme.primary }}>点击卡片看解析</p>
             </div>
 
             {/* Back Side */}
-            <div className="absolute inset-0 bg-white rounded-[40px] shadow-2xl flex flex-col items-center justify-center p-8 border-8 border-pink-100 backface-hidden rotate-y-180">
+            <div 
+              className="absolute inset-0 bg-white rounded-[40px] shadow-2xl flex flex-col items-center justify-center p-8 border-8 backface-hidden rotate-y-180"
+              style={{ borderColor: theme.accent + '33' }}
+            >
               <div className="text-center">
-                <p className="text-3xl text-pink-500 font-bold mb-4">{currentCard.pinyin}</p>
-                <div className="h-px w-24 bg-pink-100 mx-auto mb-8" />
+                <p className="text-3xl font-bold mb-4" style={{ color: theme.primary }}>{currentCard.pinyin}</p>
+                <div className="h-px w-24 mx-auto mb-8" style={{ backgroundColor: theme.accent + '33' }} />
                 <h2 className="text-6xl font-bold text-gray-800">{currentCard.content}</h2>
               </div>
 
               {/* 分类标签 Badge */}
-              <div className="mt-4 px-4 py-1 bg-pink-100 text-pink-500 text-sm rounded-full font-medium">
+              <div 
+                className="mt-4 px-4 py-1 text-sm rounded-full font-medium"
+                style={{ backgroundColor: theme.secondary, color: theme.primary }}
+              >
                 {currentCard.tags || '魔法字卡'}
               </div>
 
               <button
                 onClick={(e) => { e.stopPropagation(); speak(currentCard.content); }}
-                className="mt-12 bg-pink-50 p-6 rounded-full text-pink-500"
+                className="mt-12 p-6 rounded-full"
+                style={{ backgroundColor: theme.secondary, color: theme.primary }}
               >
                 <Volume2 className="w-10 h-10" />
               </button>
@@ -185,14 +208,17 @@ const Study = () => {
       <div className="p-8 grid grid-cols-2 gap-6">
         <button
           onClick={() => handleNext(false)}
-          className="flex items-center justify-center space-x-2 py-5 bg-white border-4 border-rose-100 rounded-3xl text-rose-500 font-bold active:scale-95 transition-all shadow-lg shadow-rose-50"
+          disabled={isTransitioning}
+          className={`flex items-center justify-center space-x-2 py-5 bg-white border-4 border-rose-100 rounded-3xl text-rose-500 font-bold transition-all shadow-lg shadow-rose-50 ${isTransitioning ? 'opacity-50 grayscale' : 'active:scale-95'}`}
         >
           <X className="w-6 h-6" />
           <span>记不住</span>
         </button>
         <button
           onClick={() => handleNext(true)}
-          className="flex items-center justify-center space-x-2 py-5 bg-pink-500 text-white font-bold rounded-3xl active:scale-95 transition-all shadow-lg shadow-pink-200"
+          disabled={isTransitioning}
+          className={`flex items-center justify-center space-x-2 py-5 text-white font-bold rounded-3xl transition-all shadow-lg ${isTransitioning ? 'opacity-50 grayscale' : 'active:scale-95'}`}
+          style={{ backgroundColor: theme.primary, boxShadow: isTransitioning ? 'none' : `0 10px 20px ${theme.primary}33` }}
         >
           <Check className="w-6 h-6" />
           <span>认识了</span>
