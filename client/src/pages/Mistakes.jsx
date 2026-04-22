@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { ChevronLeft, RefreshCw, Star, Trash2 } from 'lucide-react';
+import { ChevronLeft, RefreshCw, Star, Trash2, Snowflake } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const Mistakes = () => {
   const navigate = useNavigate();
+  const { theme, themeName } = useTheme();
   const [mistakes, setMistakes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,26 +32,35 @@ const Mistakes = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-6 bg-pink-50 overflow-y-auto">
+    <div className="flex-1 flex flex-col p-6 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       <div className="flex items-center justify-between mb-8">
-        <button onClick={() => navigate('/')} className="p-2 text-pink-500 bg-white rounded-full shadow-sm">
+        <button 
+          onClick={() => navigate('/')} 
+          className="p-2 rounded-full shadow-sm"
+          style={{ backgroundColor: 'white', color: theme.primary }}
+        >
           <ChevronLeft />
         </button>
         <h2 className="text-xl font-bold text-gray-800">魔法错题本</h2>
         <div className="w-10" />
       </div>
 
-      <div className="bg-white rounded-[40px] p-8 mb-8 shadow-xl shadow-pink-100 flex flex-col items-center">
-        <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mb-4">
-          <Star className="text-rose-500 fill-rose-500 w-10 h-10" />
+      <div className="bg-white rounded-[40px] p-8 mb-8 shadow-xl flex flex-col items-center" style={{ boxShadow: `0 20px 40px ${theme.primary}11` }}>
+        <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: theme.secondary }}>
+          {themeName === 'magic' ? (
+            <Star className="w-10 h-10" style={{ color: theme.primary, fill: theme.primary }} />
+          ) : (
+            <Snowflake className="w-10 h-10" style={{ color: theme.primary }} />
+          )}
         </div>
         <h3 className="text-2xl font-bold text-gray-800">{mistakes.length}</h3>
         <p className="text-gray-400 text-sm">待攻克的生词</p>
         
         {mistakes.length > 0 && (
           <button 
-            onClick={() => navigate('/study?tag=mistake')} // For simplicity, tag=mistake logic can be handled in Study
-            className="mt-6 px-10 py-4 bg-pink-500 text-white font-bold rounded-full shadow-lg shadow-pink-200 active:scale-95 transition-all"
+            onClick={() => navigate('/study?tag=mistake')}
+            className="mt-6 px-10 py-4 text-white font-bold rounded-full shadow-lg active:scale-95 transition-all"
+            style={{ backgroundColor: theme.primary }}
           >
             开始复习
           </button>

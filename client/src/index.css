@@ -4,6 +4,21 @@
 
 :root {
   --app-height: 100%;
+  --color-primary: #ec4899;
+  --color-secondary: #fdf2f8;
+  --color-accent: #f472b6;
+}
+
+.theme-bg {
+  background-image: var(--theme-bg-image);
+  background-size: cover;
+  background-position: center;
+}
+
+[data-theme='frozen'] {
+  --color-primary: #0ea5e9;
+  --color-secondary: #f0f9ff;
+  --color-accent: #38bdf8;
 }
 
 html, body, #root {

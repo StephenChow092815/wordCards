@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Volume2, Check, X, RefreshCw } from 'lucide-react';
+import { ChevronLeft, Volume2, Check, X, RefreshCw, Snowflake } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Study = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const showToast = useToast();
+  const { theme } = useTheme();
   const tag = searchParams.get('tag');
 
   const [cards, setCards] = useState([]);
@@ -113,20 +115,25 @@ const Study = () => {
   const currentCard = cards[currentIndex];
 
   return (
-    <div className="flex-1 flex flex-col bg-pink-50">
+    <div className="flex-1 flex flex-col transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       {/* Header */}
       <div className="p-4 flex items-center justify-between">
-        <button onClick={() => navigate('/')} className="p-2 text-pink-500 bg-white rounded-full shadow-sm">
+        <button 
+          onClick={() => navigate('/')} 
+          className="p-2 rounded-full shadow-sm"
+          style={{ backgroundColor: 'white', color: theme.primary }}
+        >
           <ChevronLeft />
         </button>
-        <div className="flex-1 mx-4 h-3 bg-pink-100 rounded-full overflow-hidden">
+        <div className="flex-1 mx-4 h-3 bg-white/50 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${((currentIndex + 1) / cards.length) * 100}%` }}
-            className="h-full bg-pink-500"
+            className="h-full"
+            style={{ backgroundColor: theme.primary }}
           />
         </div>
-        <span className="text-xs font-bold text-pink-400">{currentIndex + 1}/{cards.length}</span>
+        <span className="text-xs font-bold" style={{ color: theme.primary }}>{currentIndex + 1}/{cards.length}</span>
       </div>
 
       {/* Card Container */}

@@ -7,6 +7,7 @@ import Library from './pages/Library';
 import Categories from './pages/Categories';
 import Mistakes from './pages/Mistakes';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -33,23 +34,25 @@ function App() {
     localStorage.removeItem('token');
   };
 
-  if (loading) return <div className="h-full flex items-center justify-center text-pink-500">加载中...</div>;
+  if (loading) return <div className="h-full flex items-center justify-center text-pink-500 font-bold">加载中...</div>;
 
   return (
-    <ToastProvider>
-      <Router>
-        <div className="h-full max-w-md mx-auto relative bg-white shadow-xl overflow-hidden flex flex-col">
-          <Routes>
-            <Route path="/login" element={user ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
-            <Route path="/" element={user ? <Home user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
-            <Route path="/study" element={user ? <Study /> : <Navigate to="/login" />} />
-            <Route path="/library" element={user ? <Library /> : <Navigate to="/login" />} />
-            <Route path="/categories" element={user ? <Categories /> : <Navigate to="/login" />} />
-            <Route path="/mistakes" element={user ? <Mistakes /> : <Navigate to="/login" />} />
-          </Routes>
-        </div>
-      </Router>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <Router>
+          <div className="h-full max-w-md mx-auto relative bg-white shadow-xl overflow-hidden flex flex-col">
+            <Routes>
+              <Route path="/login" element={user ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
+              <Route path="/" element={user ? <Home user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+              <Route path="/study" element={user ? <Study /> : <Navigate to="/login" />} />
+              <Route path="/library" element={user ? <Library /> : <Navigate to="/login" />} />
+              <Route path="/categories" element={user ? <Categories /> : <Navigate to="/login" />} />
+              <Route path="/mistakes" element={user ? <Mistakes /> : <Navigate to="/login" />} />
+            </Routes>
+          </div>
+        </Router>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

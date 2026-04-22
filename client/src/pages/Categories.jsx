@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Star, Sparkles } from 'lucide-react';
+import { ChevronLeft, Star, Sparkles, Snowflake } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const Categories = () => {
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { theme, themeName } = useTheme();
 
   useEffect(() => {
     fetchTags();
@@ -28,9 +30,13 @@ const Categories = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-6 bg-pink-50 overflow-y-auto">
+    <div className="flex-1 flex flex-col p-6 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       <div className="flex items-center justify-between mb-8">
-        <button onClick={() => navigate('/')} className="p-2 text-pink-500 bg-white rounded-full shadow-sm">
+        <button 
+          onClick={() => navigate('/')} 
+          className="p-2 rounded-full shadow-sm"
+          style={{ backgroundColor: 'white', color: theme.primary }}
+        >
           <ChevronLeft />
         </button>
         <h2 className="text-xl font-bold text-gray-800">选择分类</h2>
@@ -39,9 +45,15 @@ const Categories = () => {
 
       <div className="flex flex-col items-center mb-8">
         <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-lg">
-          <Sparkles className="text-pink-400 w-10 h-10" />
+          {themeName === 'magic' ? (
+            <Sparkles className="w-10 h-10" style={{ color: theme.accent }} />
+          ) : (
+            <Snowflake className="w-10 h-10 animate-spin-slow" style={{ color: theme.primary }} />
+          )}
         </div>
-        <p className="text-gray-400 text-sm">你想学习哪一类魔法卡呢？</p>
+        <p className="text-sm opacity-60" style={{ color: theme.primary }}>
+          {themeName === 'magic' ? '你想学习哪一类魔法卡呢？' : '你想开启哪一扇冰雪之门呢？'}
+        </p>
       </div>
 
       {loading ? (
@@ -57,10 +69,15 @@ const Categories = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate(`/study?tag=${tag}`)}
-              className="p-6 bg-white rounded-[32px] border-2 border-pink-100 flex flex-col items-center justify-center shadow-md shadow-pink-100"
+              className="p-6 bg-white rounded-[32px] border-2 flex flex-col items-center justify-center shadow-md"
+              style={{ borderColor: theme.accent + '33' }}
             >
-              <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center mb-3">
-                <Star className="text-pink-400 fill-pink-400 w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ backgroundColor: theme.secondary }}>
+                {themeName === 'magic' ? (
+                  <Star className="w-6 h-6" style={{ color: theme.primary, fill: theme.primary }} />
+                ) : (
+                  <Snowflake className="w-6 h-6" style={{ color: theme.primary }} />
+                )}
               </div>
               <span className="font-bold text-gray-700 text-lg">{tag}</span>
             </motion.button>
