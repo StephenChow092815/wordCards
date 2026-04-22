@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: ./server
+    container_name: word-cards-backend
+    restart: always
+    environment:
+      - PORT=5001
+      - JWT_SECRET=your_production_secret_here
+      - DATABASE_URL=/app/data/database.sqlite
+    volumes:
+      - ./data:/app/data
+    networks:
+      - word-cards-network
+
+  frontend:
+    build: ./client
+    container_name: word-cards-frontend
+    restart: always
+    ports:
+      - "6688:80"
+    depends_on:
+      - backend
+    networks:
+      - word-cards-network
+
+networks:
+  word-cards-network:
+    driver: bridge

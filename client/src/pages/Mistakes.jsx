@@ -1,0 +1,98 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import { ChevronLeft, RefreshCw, Star, Trash2 } from 'lucide-react';
+
+const Mistakes = () => {
+  const navigate = useNavigate();
+  const [mistakes, setMistakes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchMistakes();
+  }, []);
+
+  const fetchMistakes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { data } = await axios.get('/api/mistakes', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // 增加前端排序兜底，确保 ID 最大的（最新添加的）排在最前面
+      const sortedData = [...data].sort((a, b) => b.id - a.id);
+      setMistakes(sortedData);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col p-6 bg-pink-50 overflow-y-auto">
+      <div className="flex items-center justify-between mb-8">
+        <button onClick={() => navigate('/')} className="p-2 text-pink-500 bg-white rounded-full shadow-sm">
+          <ChevronLeft />
+        </button>
+        <h2 className="text-xl font-bold text-gray-800">魔法错题本</h2>
+        <div className="w-10" />
+      </div>
+
+      <div className="bg-white rounded-[40px] p-8 mb-8 shadow-xl shadow-pink-100 flex flex-col items-center">
+        <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mb-4">
+          <Star className="text-rose-500 fill-rose-500 w-10 h-10" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-800">{mistakes.length}</h3>
+        <p className="text-gray-400 text-sm">待攻克的生词</p>
+        
+        {mistakes.length > 0 && (
+          <button 
+            onClick={() => navigate('/study?tag=mistake')} // For simplicity, tag=mistake logic can be handled in Study
+            className="mt-6 px-10 py-4 bg-pink-500 text-white font-bold rounded-full shadow-lg shadow-pink-200 active:scale-95 transition-all"
+          >
+            开始复习
+          </button>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        {mistakes.map((card) => (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            key={card.id} 
+            className="p-5 bg-white rounded-3xl border border-pink-50 flex items-center justify-between shadow-sm"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 flex-shrink-0 bg-pink-50 rounded-2xl flex items-center justify-center text-xl font-bold text-gray-700">
+                {card.content.charAt(0)}
+              </div>
+              <div>
+                <div className="flex items-baseline space-x-2">
+                  <p className="font-bold text-lg text-gray-700">{card.content}</p>
+                  <p className="text-sm text-pink-400 font-medium">{card.pinyin}</p>
+                </div>
+                <p className="text-[10px] text-rose-400">错误次数: {card.miss_count}次</p>
+              </div>
+            </div>
+            <button className="text-gray-300 hover:text-rose-500 p-2">
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          </motion.div>
+        ))}
+      </div>
+
+      {mistakes.length === 0 && !loading && (
+        <div className="flex-1 flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-6 shadow-inner">
+            <Star className="text-amber-200 fill-amber-200 w-16 h-16" />
+          </div>
+          <p className="text-gray-400">哇！还没有错题哦<br/>宝贝真聪明！</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Mistakes;
