@@ -14,11 +14,14 @@ const Login = ({ onLogin }) => {
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    // Preload theme background images
+    // Preload theme background and logo images
     const images = [
       '/themes/mermaid/bg.png',
+      '/themes/mermaid/logo.png',
       '/themes/elsa/bg.png',
-      '/themes/kuromi/bg.png'
+      '/themes/elsa/logo.png',
+      '/themes/kuromi/bg.png',
+      '/themes/kuromi/logo.png'
     ];
     images.forEach(src => {
       const img = new Image();
