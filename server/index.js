@@ -186,7 +186,7 @@ app.get('/api/mistakes', authenticate, (req, res) => {
     JOIN cards c ON m.card_id = c.id 
     WHERE m.user_id = ? AND m.is_hidden = 0
   `).all(req.user.id);
-  res.json(mistakes);
+  res.json(mistakes.map(m => ({ ...m, type: 'word' })));
 });
 
 app.post('/api/mistakes', authenticate, (req, res) => {
@@ -210,6 +210,44 @@ app.delete('/api/mistakes/:cardId', authenticate, (req, res) => {
   const { cardId } = req.params;
   try {
     db.prepare('UPDATE mistakes SET is_hidden = 1 WHERE user_id = ? AND card_id = ?').run(req.user.id, cardId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- Math Mistake Routes ---
+
+app.get('/api/math-mistakes', authenticate, (req, res) => {
+  const mistakes = db.prepare(`
+    SELECT * FROM math_mistakes 
+    WHERE user_id = ? AND is_hidden = 0
+    ORDER BY last_missed DESC
+  `).all(req.user.id);
+  res.json(mistakes.map(m => ({ ...m, type: 'math' })));
+});
+
+app.post('/api/math-mistakes', authenticate, (req, res) => {
+  const { problem, answer } = req.body;
+  try {
+    db.prepare(`
+      INSERT INTO math_mistakes (user_id, problem, answer, is_hidden) 
+      VALUES (?, ?, ?, 0) 
+      ON CONFLICT(user_id, problem) DO UPDATE SET 
+        miss_count = miss_count + 1,
+        last_missed = CURRENT_TIMESTAMP,
+        is_hidden = 0
+    `).run(req.user.id, problem, answer);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/math-mistakes/:id', authenticate, (req, res) => {
+  const { id } = req.params;
+  try {
+    db.prepare('UPDATE math_mistakes SET is_hidden = 1 WHERE user_id = ? AND id = ?').run(req.user.id, id);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });

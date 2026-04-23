@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Play, Plus, BookOpen, LogOut, Star, Wand2, Snowflake, Waves, Ghost } from 'lucide-react';
+import { Play, Plus, BookOpen, LogOut, Star, Wand2, Snowflake, Waves, Ghost, Volume2, Calculator } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const Home = ({ user, onLogout }) => {
@@ -59,7 +59,7 @@ const Home = ({ user, onLogout }) => {
     <div className="flex-1 flex flex-col p-6 overflow-y-auto relative transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       {/* Background Pattern Overlay */}
       <div 
-        className="absolute inset-0 opacity-20 pointer-events-none transition-all duration-1000" 
+        className="absolute inset-0 opacity-50 pointer-events-none transition-all duration-1000" 
         style={{ 
           backgroundImage: `url(${theme.bg})`, 
           backgroundSize: 'cover',
@@ -70,11 +70,11 @@ const Home = ({ user, onLogout }) => {
       
       <div className="flex items-center justify-between mb-8 relative z-10">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-inner" style={{ backgroundColor: theme.accent + '33' }}>
-            {getThemeIcon("w-6 h-6", { color: theme.primary, fill: themeName === 'frozen' ? 'none' : theme.primary })}
+          <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50" style={{ backgroundColor: 'white' }}>
+            <img src={theme.logo} alt="logo" className="w-full h-full object-cover" />
           </div>
           <div>
-            <h2 className="font-bold" style={{ color: theme.primary }}>
+            <h2 className="font-bold text-lg" style={{ color: theme.primary }}>
               {getThemeWelcome()}
             </h2>
             <p className="text-xs opacity-60" style={{ color: theme.primary }}>{user.phone}</p>
@@ -82,14 +82,17 @@ const Home = ({ user, onLogout }) => {
         </div>
         <div className="flex items-center space-x-2">
           <button 
-            onClick={toggleTheme} 
-            className="p-2 rounded-full transition-all active:scale-90 shadow-sm"
-            style={{ backgroundColor: 'white', color: theme.primary }}
+            onClick={toggleTheme}
+            className="p-3 rounded-2xl shadow-lg transition-all active:scale-90"
+            style={{ backgroundColor: theme.primary, color: 'white' }}
           >
-            <Wand2 className="w-5 h-5" />
+            <Wand2 size={20} />
           </button>
-          <button onClick={onLogout} className="p-2 text-gray-400 hover:text-rose-500">
-            <LogOut className="w-6 h-6" />
+          <button 
+            onClick={onLogout}
+            className="p-3 bg-white text-gray-400 rounded-2xl shadow-md"
+          >
+            <LogOut size={20} />
           </button>
         </div>
       </div>
@@ -105,26 +108,39 @@ const Home = ({ user, onLogout }) => {
           onClick={() => navigate('/study')}
         />
         <MenuCard 
+          icon={<Volume2 className="w-8 h-8 text-white" />}
+          title="听认挑战"
+          desc="听音辨字大冲关"
+          color={theme.cardColors[1]}
+          onClick={() => navigate('/quiz')}
+        />
+        <MenuCard 
           icon={<Star className="w-8 h-8 text-white" />}
           title="分类学习"
           desc="按标签挑选字卡"
-          color={theme.cardColors[1]}
+          color={theme.cardColors[2]}
           onClick={() => navigate('/categories')}
         />
         <MenuCard 
           icon={<BookOpen className="w-8 h-8 text-white" />}
           title="我的错题"
           desc="复习记错的字"
-          color={theme.cardColors[2]}
+          color={theme.cardColors[3]}
           onClick={() => navigate('/mistakes')}
+        />
+        <MenuCard 
+          icon={<Calculator className="w-8 h-8 text-white" />}
+          title="算术挑战"
+          desc="5以内加减法"
+          color={theme.cardColors[4]}
+          onClick={() => navigate('/math-quiz')}
         />
         <MenuCard 
           icon={<Plus className="w-8 h-8 text-white" />}
           title="字卡管理"
-          desc="添加新的生词"
-          color={theme.cardColors[3]}
+          desc="词库同步管理"
+          color={theme.cardColors[5]}
           onClick={() => navigate('/library')}
-          className="col-span-2"
         />
       </div>
 

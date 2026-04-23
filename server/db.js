@@ -51,6 +51,18 @@ db.exec(`
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(card_id) REFERENCES cards(id)
   );
+
+  CREATE TABLE IF NOT EXISTS math_mistakes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    problem TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    miss_count INTEGER DEFAULT 1,
+    last_missed DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_hidden INTEGER DEFAULT 0,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    UNIQUE(user_id, problem)
+  );
 `);
 
 console.log('Database initialized at:', dbPath);

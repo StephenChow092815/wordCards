@@ -44,8 +44,19 @@ const Categories = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-6 overflow-y-auto min-h-0 transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
-      <div className="flex items-center justify-between mb-8">
+    <div className="flex-1 flex flex-col p-6 overflow-y-auto min-h-0 relative transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
+      {/* Background Pattern Overlay */}
+      <div 
+        className="absolute inset-0 opacity-50 pointer-events-none transition-all duration-1000" 
+        style={{ 
+          backgroundImage: `url(${theme.bg})`, 
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }} 
+      />
+
+      <div className="flex items-center justify-between mb-8 relative z-10">
         <button 
           onClick={() => navigate('/')} 
           className="p-2 rounded-full shadow-sm"
@@ -57,19 +68,19 @@ const Categories = () => {
         <div className="w-10" />
       </div>
 
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-lg">
-          {getThemeIcon("w-10 h-10", { color: theme.primary, fill: themeName === 'frozen' ? 'none' : theme.primary })}
+      <div className="flex flex-col items-center mb-8 relative z-10">
+        <div className="w-20 h-20 bg-white rounded-3xl overflow-hidden flex items-center justify-center mb-4 shadow-xl border-2 border-white">
+          <img src={theme.logo} alt="logo" className="w-full h-full object-cover" />
         </div>
-        <p className="text-sm font-bold opacity-60" style={{ color: theme.primary }}>
+        <p className="text-sm font-bold opacity-60 text-center px-4" style={{ color: theme.primary }}>
           {getThemeWelcome()}
         </p>
       </div>
 
       {loading ? (
-        <div className="text-center" style={{ color: theme.primary }}>加载中...</div>
+        <div className="text-center relative z-10" style={{ color: theme.primary }}>加载中...</div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 relative z-10 pb-10">
           {tags.map((tag, index) => (
             <motion.button
               key={tag}

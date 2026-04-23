@@ -16,7 +16,9 @@ const themes = {
       'bg-pink-400',
       'bg-teal-400',
       'bg-rose-400',
-      'bg-cyan-400'
+      'bg-cyan-400',
+      'bg-amber-400',
+      'bg-indigo-400'
     ]
   },
   frozen: {
@@ -30,7 +32,9 @@ const themes = {
       'bg-sky-400',
       'bg-blue-400',
       'bg-indigo-400',
-      'bg-cyan-400'
+      'bg-cyan-400',
+      'bg-violet-400',
+      'bg-emerald-400'
     ]
   },
   kuromi: {
@@ -44,7 +48,9 @@ const themes = {
       'bg-purple-600',
       'bg-slate-900',
       'bg-fuchsia-600',
-      'bg-violet-600'
+      'bg-violet-600',
+      'bg-pink-600',
+      'bg-zinc-600'
     ]
   }
 };

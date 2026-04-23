@@ -6,6 +6,8 @@ import Study from './pages/Study';
 import Library from './pages/Library';
 import Categories from './pages/Categories';
 import Mistakes from './pages/Mistakes';
+import Quiz from './pages/Quiz';
+import MathQuiz from './pages/MathQuiz';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -48,6 +50,8 @@ function App() {
               <Route path="/library" element={user ? <Library /> : <Navigate to="/login" />} />
               <Route path="/categories" element={user ? <Categories /> : <Navigate to="/login" />} />
               <Route path="/mistakes" element={user ? <Mistakes /> : <Navigate to="/login" />} />
+              <Route path="/quiz" element={user ? <Quiz /> : <Navigate to="/login" />} />
+              <Route path="/math-quiz" element={user ? <MathQuiz /> : <Navigate to="/login" />} />
             </Routes>
           </div>
         </Router>
