@@ -51,8 +51,10 @@ const Study = () => {
 
     try {
       if (!correct) {
+        speak('再想想看哦');
         await markAsMistake(cards[currentIndex].id);
       } else {
+        speak('答对了，你真聪明！');
         // 只要记住了，就尝试从错题本中移除（软删除）
         await removeMistake(cards[currentIndex].id);
         // 记录学习日志
@@ -112,10 +114,16 @@ const Study = () => {
   };
 
   const speak = (text) => {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
-    speechSynthesis.speak(utterance);
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
   };
+
+  // Removed the auto-speak on currentIndex change as per new request
+  // We will trigger speech manually on flip and button clicks
 
   if (loading) return <div className="h-full flex items-center justify-center text-pink-500">加载中...</div>;
   if (cards.length === 0) return (
@@ -158,7 +166,13 @@ const Study = () => {
             animate={{ x: 0, opacity: 1, rotateY: isFlipped ? 180 : 0 }}
             exit={{ x: -300, opacity: 0 }}
             transition={{ duration: 0.6, type: 'spring' }}
-            onClick={() => setIsFlipped(!isFlipped)}
+            onClick={() => {
+              if (!isFlipped) {
+                // Wait a tiny bit for the flip animation start
+                setTimeout(() => speak(currentCard.content), 100);
+              }
+              setIsFlipped(!isFlipped);
+            }}
             className="relative w-full h-[60vh] max-h-[600px] cursor-pointer preserve-3d"
           >
             {/* Front Side */}

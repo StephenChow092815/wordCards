@@ -79,6 +79,9 @@ const Quiz = () => {
     setSelectedAnswer(option.id);
     setIsCorrect(isRight);
     
+    // Play feedback voice
+    speak(isRight ? '答对了，你真聪明！' : '再想想看哦');
+    
     if (!isRight) {
       try {
         const token = localStorage.getItem('token');

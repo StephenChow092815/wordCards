@@ -49,7 +49,7 @@ const Home = ({ user, onLogout }) => {
   };
 
   const getThemeWelcome = () => {
-    if (themeName === 'mermaid') return '你好呀！小人鱼';
+    if (themeName === 'mermaid') return '你好呀！小美人鱼';
     if (themeName === 'frozen') return '你好呀！小公主';
     if (themeName === 'kuromi') return '嘿！酷洛米大人';
     return '你好呀！魔法师';
@@ -58,16 +58,16 @@ const Home = ({ user, onLogout }) => {
   return (
     <div className="flex-1 flex flex-col p-6 overflow-y-auto relative transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       {/* Background Pattern Overlay */}
-      <div 
-        className="absolute inset-0 opacity-50 pointer-events-none transition-all duration-1000" 
-        style={{ 
-          backgroundImage: `url(${theme.bg})`, 
+      <div
+        className="absolute inset-0 opacity-50 pointer-events-none transition-all duration-1000"
+        style={{
+          backgroundImage: `url(${theme.bg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
-        }} 
+        }}
       />
-      
+
       <div className="flex items-center justify-between mb-8 relative z-10">
         <div className="flex items-center space-x-3">
           <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50" style={{ backgroundColor: 'white' }}>
@@ -81,14 +81,14 @@ const Home = ({ user, onLogout }) => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button 
+          <button
             onClick={toggleTheme}
             className="p-3 rounded-2xl shadow-lg transition-all active:scale-90"
             style={{ backgroundColor: theme.primary, color: 'white' }}
           >
             <Wand2 size={20} />
           </button>
-          <button 
+          <button
             onClick={onLogout}
             className="p-3 bg-white text-gray-400 rounded-2xl shadow-md"
           >
@@ -100,42 +100,42 @@ const Home = ({ user, onLogout }) => {
       {/* 移除分类魔法林部分 */}
 
       <div className="grid grid-cols-2 gap-4 flex-1 content-start relative z-10">
-        <MenuCard 
+        <MenuCard
           icon={<Play className="w-8 h-8 text-white" />}
           title="开始认字"
           desc="随机50个魔法卡"
           color={theme.cardColors[0]}
           onClick={() => navigate('/study')}
         />
-        <MenuCard 
+        <MenuCard
           icon={<Volume2 className="w-8 h-8 text-white" />}
           title="听认挑战"
           desc="听音辨字大冲关"
           color={theme.cardColors[1]}
           onClick={() => navigate('/quiz')}
         />
-        <MenuCard 
+        <MenuCard
           icon={<Star className="w-8 h-8 text-white" />}
           title="分类学习"
           desc="按标签挑选字卡"
           color={theme.cardColors[2]}
           onClick={() => navigate('/categories')}
         />
-        <MenuCard 
+        <MenuCard
           icon={<BookOpen className="w-8 h-8 text-white" />}
           title="我的错题"
           desc="复习记错的字"
           color={theme.cardColors[3]}
           onClick={() => navigate('/mistakes')}
         />
-        <MenuCard 
+        <MenuCard
           icon={<Calculator className="w-8 h-8 text-white" />}
           title="算术挑战"
           desc="5以内加减法"
           color={theme.cardColors[4]}
           onClick={() => navigate('/math-quiz')}
         />
-        <MenuCard 
+        <MenuCard
           icon={<Plus className="w-8 h-8 text-white" />}
           title="字卡管理"
           desc="词库同步管理"
@@ -151,8 +151,8 @@ const Home = ({ user, onLogout }) => {
         <div>
           <p className="text-sm font-bold" style={{ color: theme.primary }}>今日已学 {todayCount} 个字</p>
           <p className="text-xs opacity-60" style={{ color: theme.primary }}>
-            {todayCount > 0 
-              ? (themeName === 'mermaid' ? '深海珍珠正在发光，继续加油！' : (themeName === 'frozen' ? '冰雪魔法正在增强，继续加油！' : '酷洛米的恶作剧力量在提升！')) 
+            {todayCount > 0
+              ? (themeName === 'mermaid' ? '深海珍珠正在发光，继续加油！' : (themeName === 'frozen' ? '冰雪魔法正在增强，继续加油！' : '酷洛米的恶作剧力量在提升！'))
               : '开启你的魔法识字之旅吧！'}
           </p>
         </div>
