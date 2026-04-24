@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Volume2, Check, X, RefreshCw, Snowflake } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
+import { speak } from '../utils/speech';
 
 const Study = () => {
   const [searchParams] = useSearchParams();
@@ -112,18 +113,6 @@ const Study = () => {
       console.error(err);
     }
   };
-
-  const speak = (text) => {
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
-  };
-
-  // Removed the auto-speak on currentIndex change as per new request
-  // We will trigger speech manually on flip and button clicks
 
   if (loading) return <div className="h-full flex items-center justify-center text-pink-500">加载中...</div>;
   if (cards.length === 0) return (

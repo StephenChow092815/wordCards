@@ -12,9 +12,20 @@ const Home = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const { theme, toggleTheme, themeName } = useTheme();
 
+  const [isSecure, setIsSecure] = useState(true);
+  const [speechSupported, setSpeechSupported] = useState(true);
+
   useEffect(() => {
     fetchTags();
     fetchTodayStats();
+
+    // Check if context is secure (required for Speech API on some mobile browsers)
+    if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      setIsSecure(false);
+    }
+    if (!window.speechSynthesis) {
+      setSpeechSupported(false);
+    }
   }, []);
 
   const fetchTags = async () => {
@@ -67,6 +78,25 @@ const Home = ({ user, onLogout }) => {
           backgroundRepeat: 'no-repeat'
         }}
       />
+
+      {/* Security/Speech Warning */}
+      {(!isSecure || !speechSupported) && (
+        <div className="relative z-20 mb-4 p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-800 text-xs">
+          <p className="font-bold mb-1 flex items-center">
+            <Star className="w-3 h-3 mr-1 fill-amber-500" />
+            语音功能受限提醒
+          </p>
+          {!speechSupported ? (
+            <p>您的浏览器不支持语音播报，请更换浏览器试试。</p>
+          ) : (
+            <p>
+              检测到您正在使用非安全连接访问（HTTP）。安卓 Chrome 等浏览器会禁用此类环境下的语音功能。
+              <br />
+              <span className="font-bold underline">修复方法：</span>在 Chrome 地址栏输入 <b>chrome://flags/#unsafely-treat-insecure-origin-as-secure</b> 并将您的 IP 设为白名单。
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center justify-between mb-8 relative z-10">
         <div className="flex items-center space-x-3">

@@ -1,0 +1,13 @@
+services:
+  melo-tts:
+    build:
+      context: .
+      dockerfile: Dockerfile.melo
+    container_name: melo-tts
+    ports:
+      - "9966:8888"
+    volumes:
+      - ./melo_models:/root/.cache
+    environment:
+      - USE_CPU=true
+    restart: always

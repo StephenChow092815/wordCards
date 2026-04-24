@@ -22,6 +22,22 @@ function App() {
       setUser(JSON.parse(savedUser));
     }
     setLoading(false);
+
+    // Warm up speech synthesis for mobile devices (like Huawei/Android)
+    const initSpeech = () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        // Create a silent utterance to "unlock" the engine
+        const dummy = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(dummy);
+      }
+    };
+    
+    // Trigger on first interaction
+    window.addEventListener('click', initSpeech, { once: true });
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = initSpeech;
+    }
   }, []);
 
   const handleLogin = (userData, token) => {

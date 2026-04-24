@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Volume2, CheckCircle2, XCircle, Calculator } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
+import { speak } from '../utils/speech';
 
 const MathQuiz = () => {
   const [problem, setProblem] = useState(null);
@@ -69,13 +70,7 @@ const MathQuiz = () => {
     generateProblem();
   };
 
-  const speak = (text) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
-  };
+  // Using imported speak utility
 
   const handleAnswer = async (option) => {
     if (isTransitioning || selectedAnswer !== null) return;

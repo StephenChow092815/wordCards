@@ -14,8 +14,48 @@ function log(msg) {
 }
 
 const app = express();
+const http = require('http'); // Required for local MeloTTS proxy
+const https = require('https'); // Required for Cloud TTS proxy
 app.use(cors());
 app.use(express.json());
+
+// --- TTS Proxy Route (Exclusively for local MeloTTS) ---
+app.get('/api/proxy/tts', (req, res) => {
+  const { text } = req.query;
+  if (!text) return res.status(400).send('Text is required');
+
+  const cleanText = text.replace(/[\s\?？\.\!！,，\(\)\（\）]/g, '').trim();
+  
+  // Try /tts first, fallback to / if needed
+  const tryMelo = (path) => {
+    const url = `http://127.0.0.1:9966${path}?text=${encodeURIComponent(cleanText)}&speaker=ZH&speed=1.0`;
+    
+    http.get(url, (meloRes) => {
+      if (meloRes.statusCode === 200) {
+        console.log(`[MeloTTS] Success: "${cleanText}" (Path: ${path})`);
+        res.setHeader('Content-Type', 'audio/wav');
+        return meloRes.pipe(res);
+      }
+      
+      if (path === '/tts') {
+        // If /tts fails, try root path
+        return tryMelo('/');
+      } else {
+        console.error(`[MeloTTS] All paths failed. Last status: ${meloRes.statusCode}`);
+        res.status(500).send(`MeloTTS Engine Error: ${meloRes.statusCode}`);
+      }
+    }).on('error', (err) => {
+      console.error(`[MeloTTS] Connection Error on ${path}:`, err.message);
+      if (path === '/tts') {
+        return tryMelo('/');
+      } else {
+        res.status(500).send('MeloTTS not ready. Please check "docker logs melo-tts"');
+      }
+    });
+  };
+
+  tryMelo('/tts');
+});
 
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
@@ -279,8 +319,8 @@ app.get('/api/study/today', authenticate, (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
   
   // Seed initial data if cards table is empty
   const count = db.prepare('SELECT COUNT(*) as count FROM cards').get().count;
