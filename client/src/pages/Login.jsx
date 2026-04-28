@@ -13,21 +13,7 @@ const Login = ({ onLogin }) => {
   const showToast = useToast();
   const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    // Preload theme background and logo images
-    const images = [
-      '/themes/mermaid/bg.png',
-      '/themes/mermaid/logo.png',
-      '/themes/elsa/bg.png',
-      '/themes/elsa/logo.png',
-      '/themes/kuromi/bg.png',
-      '/themes/kuromi/logo.png'
-    ];
-    images.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +34,7 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-hidden transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
+    <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 relative overflow-y-auto transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       {/* Background Pattern Overlay */}
       <div 
         className="absolute inset-0 opacity-40 pointer-events-none transition-all duration-1000" 
@@ -61,13 +47,13 @@ const Login = ({ onLogin }) => {
       />
 
       {/* Theme Switcher in Login */}
-      <div className="absolute top-6 right-6 z-20">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
         <button 
           onClick={toggleTheme}
-          className="p-3 rounded-2xl shadow-lg transition-all active:scale-90"
+          className="p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-90"
           style={{ backgroundColor: theme.primary, color: 'white' }}
         >
-          <Wand2 size={20} />
+          <Wand2 className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
 
@@ -75,28 +61,28 @@ const Login = ({ onLogin }) => {
         key={theme.logo}
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="mb-8 bg-white p-2 rounded-3xl shadow-2xl relative z-10 border-2"
+        className="mb-6 sm:mb-8 bg-white p-1.5 sm:p-2 rounded-2xl sm:rounded-3xl shadow-2xl relative z-10 border-2 shrink-0"
         style={{ borderColor: theme.accent + '33' }}
       >
-        <div className="w-24 h-24 rounded-2xl overflow-hidden">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden">
           <img src={theme.logo} alt="logo" className="w-full h-full object-cover" />
         </div>
       </motion.div>
       
-      <h1 className="text-3xl font-bold mb-2 relative z-10 transition-colors" style={{ color: theme.primary }}>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 relative z-10 transition-colors shrink-0" style={{ color: theme.primary }}>
         魔法认字卡
       </h1>
-      <p className="mb-8 relative z-10 opacity-70 transition-colors" style={{ color: theme.primary }}>
+      <p className="mb-6 sm:mb-8 text-sm sm:text-base relative z-10 opacity-70 transition-colors shrink-0" style={{ color: theme.primary }}>
         开启小朋友的识字旅程
       </p>
 
-      <form onSubmit={handleSubmit} className="w-full space-y-4 relative z-10 max-w-sm">
+      <form onSubmit={handleSubmit} className="w-full space-y-3 sm:space-y-4 relative z-10 max-w-sm shrink-0">
         <div className="relative">
           <User className="absolute left-4 top-3.5 w-5 h-5 transition-colors" style={{ color: theme.primary + '88' }} />
           <input
             type="text"
             placeholder="用户名 / 手机号"
-            className="w-full pl-12 pr-4 py-3.5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl outline-none transition-all focus:ring-2"
+            className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-white/90 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl outline-none transition-all focus:ring-2 text-sm sm:text-base"
             style={{ 
               borderColor: theme.accent + '33',
               '--tw-ring-color': theme.primary + '33'
@@ -111,7 +97,7 @@ const Login = ({ onLogin }) => {
           <input
             type="password"
             placeholder="登录密码"
-            className="w-full pl-12 pr-4 py-3.5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl outline-none transition-all focus:ring-2"
+            className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-white/90 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl outline-none transition-all focus:ring-2 text-sm sm:text-base"
             style={{ 
               borderColor: theme.accent + '33',
               '--tw-ring-color': theme.primary + '33'
@@ -121,11 +107,11 @@ const Login = ({ onLogin }) => {
           />
         </div>
 
-        {error && <p className="text-rose-500 text-sm text-center font-medium">{error}</p>}
+        {error && <p className="text-rose-500 text-xs sm:text-sm text-center font-medium">{error}</p>}
 
         <button
           type="submit"
-          className="w-full py-4 text-white font-bold rounded-2xl shadow-lg transition-all active:scale-95"
+          className="w-full py-3.5 sm:py-4 text-white font-bold rounded-xl sm:rounded-2xl shadow-lg transition-all active:scale-95 text-sm sm:text-base"
           style={{ backgroundColor: theme.primary, boxShadow: `0 10px 20px ${theme.primary}44` }}
         >
           {isRegister ? '开启探索' : '进入魔法世界'}
@@ -134,7 +120,7 @@ const Login = ({ onLogin }) => {
 
       <button 
         onClick={() => setIsRegister(!isRegister)}
-        className="mt-6 text-sm font-medium hover:opacity-80 transition-all relative z-10"
+        className="mt-4 sm:mt-6 text-xs sm:text-sm font-medium hover:opacity-80 transition-all relative z-10 shrink-0"
         style={{ color: theme.primary }}
       >
         {isRegister ? '已有账号？去登录' : '没有账号？去注册'}

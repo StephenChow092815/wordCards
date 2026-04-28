@@ -57,7 +57,7 @@ const Mistakes = () => {
   const currentMistakes = activeTab === 'word' ? wordMistakes : mathMistakes;
 
   return (
-    <div className="flex-1 flex flex-col p-6 overflow-y-auto min-h-0 relative transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
+    <div className="flex-1 flex flex-col p-4 sm:p-6 overflow-y-auto min-h-0 relative transition-colors duration-500" style={{ backgroundColor: theme.secondary }}>
       {/* Background Pattern Overlay */}
       <div 
         className="absolute inset-0 opacity-50 pointer-events-none transition-all duration-1000" 
@@ -69,7 +69,7 @@ const Mistakes = () => {
         }} 
       />
 
-      <div className="flex items-center justify-between mb-6 flex-shrink-0 relative z-10">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 flex-shrink-0 relative z-10">
         <button 
           onClick={() => navigate('/')} 
           className="p-2 rounded-full shadow-sm"
@@ -77,37 +77,37 @@ const Mistakes = () => {
         >
           <ChevronLeft />
         </button>
-        <h2 className="text-xl font-bold text-gray-800">魔法错题本</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800">魔法错题本</h2>
         <div className="w-10" />
       </div>
 
       {/* Tabs */}
-      <div className="flex p-1 bg-white/50 backdrop-blur-md rounded-2xl mb-6 relative z-10">
+      <div className="flex p-1 bg-white/50 backdrop-blur-md rounded-2xl mb-4 sm:mb-6 relative z-10">
         <button
           onClick={() => setActiveTab('word')}
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl font-bold transition-all ${activeTab === 'word' ? 'bg-white shadow-md' : 'text-gray-400'}`}
+          className={`flex-1 flex items-center justify-center space-x-1 sm:space-x-2 py-2 sm:py-3 rounded-xl font-bold text-sm sm:text-base transition-all ${activeTab === 'word' ? 'bg-white shadow-md' : 'text-gray-400'}`}
           style={{ color: activeTab === 'word' ? theme.primary : undefined }}
         >
-          <BookOpen size={18} />
+          <BookOpen size={16} className="sm:w-5 sm:h-5" />
           <span>识字错题</span>
         </button>
         <button
           onClick={() => setActiveTab('math')}
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl font-bold transition-all ${activeTab === 'math' ? 'bg-white shadow-md' : 'text-gray-400'}`}
+          className={`flex-1 flex items-center justify-center space-x-1 sm:space-x-2 py-2 sm:py-3 rounded-xl font-bold text-sm sm:text-base transition-all ${activeTab === 'math' ? 'bg-white shadow-md' : 'text-gray-400'}`}
           style={{ color: activeTab === 'math' ? theme.primary : undefined }}
         >
-          <Calculator size={18} />
+          <Calculator size={16} className="sm:w-5 sm:h-5" />
           <span>加减法错题</span>
         </button>
       </div>
 
       {/* Summary Card */}
-      <div className="bg-white rounded-[40px] p-8 mb-8 shadow-xl flex flex-col items-center flex-shrink-0 relative z-10" style={{ boxShadow: `0 20px 40px ${theme.primary}11` }}>
-        <div className="w-20 h-20 rounded-3xl overflow-hidden flex items-center justify-center mb-4 shadow-lg border-2 border-white">
+      <div className="bg-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 mb-6 sm:mb-8 shadow-xl flex flex-col items-center flex-shrink-0 relative z-10" style={{ boxShadow: `0 20px 40px ${theme.primary}11` }}>
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl overflow-hidden flex items-center justify-center mb-3 sm:mb-4 shadow-lg border-2 border-white">
           <img src={theme.logo} alt="logo" className="w-full h-full object-cover" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-800">{currentMistakes.length}</h3>
-        <p className="text-gray-400 text-sm">待攻克的{activeTab === 'word' ? '生词' : '题目'}</p>
+        <h3 className="text-2xl sm:text-3xl font-bold text-gray-800">{currentMistakes.length}</h3>
+        <p className="text-gray-400 text-xs sm:text-sm mt-1">待攻克的{activeTab === 'word' ? '生词' : '题目'}</p>
         
         {currentMistakes.length > 0 && (
           <button 
@@ -118,7 +118,7 @@ const Mistakes = () => {
                 navigate('/math-quiz');
               }
             }}
-            className="mt-6 px-10 py-4 text-white font-bold rounded-full shadow-lg active:scale-95 transition-all"
+            className="mt-4 sm:mt-6 px-8 sm:px-10 py-3 sm:py-4 text-white font-bold rounded-full shadow-lg active:scale-95 transition-all text-sm sm:text-base"
             style={{ backgroundColor: theme.primary }}
           >
             重新学习
@@ -126,14 +126,14 @@ const Mistakes = () => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col relative z-10">
+      <div className="flex-1 flex flex-col relative z-10 pb-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, x: activeTab === 'word' ? -20 : 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: activeTab === 'word' ? 20 : -20 }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
             {currentMistakes.map((item, index) => (
               <motion.div
@@ -141,7 +141,7 @@ const Mistakes = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group relative flex items-center p-5 bg-white rounded-[32px] shadow-sm border border-transparent hover:border-gray-100 transition-all"
+                className="group relative flex items-center p-4 sm:p-5 bg-white rounded-[24px] sm:rounded-[32px] shadow-sm border border-transparent hover:border-gray-100 transition-all"
               >
                 {activeTab === 'word' ? (
                   <>

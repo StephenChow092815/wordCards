@@ -16,6 +16,21 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // 全局预加载所有主题的图片资源，保证各页面及弹窗无延迟
+    const themes = ['mermaid', 'elsa', 'kuromi'];
+    const pngFiles = ['bg.png', 'logo.png'];
+    const jpgFiles = ['success.jpg', 'failure.jpg'];
+    themes.forEach(theme => {
+      pngFiles.forEach(file => {
+        const img = new Image();
+        img.src = `/themes/${theme}/${file}`;
+      });
+      jpgFiles.forEach(file => {
+        const img = new Image();
+        img.src = `/themes/${theme}/${file}`;
+      });
+    });
+
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     if (savedUser && token) {

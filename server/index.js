@@ -19,42 +19,112 @@ const https = require('https'); // Required for Cloud TTS proxy
 app.use(cors());
 app.use(express.json());
 
-// --- TTS Proxy Route (Exclusively for local MeloTTS) ---
-app.get('/api/proxy/tts', (req, res) => {
+// --- Baidu TTS Configuration ---
+let baiduAccessToken = null;
+let tokenExpiresAt = 0;
+
+async function getBaiduToken() {
+  if (baiduAccessToken && Date.now() < tokenExpiresAt) {
+    return baiduAccessToken;
+  }
+  const apiKey = process.env.BAIDU_API_KEY;
+  const secretKey = process.env.BAIDU_SECRET_KEY;
+  
+  if (!apiKey || !secretKey) {
+    throw new Error('服务器未配置百度语音 API_KEY 或 SECRET_KEY');
+  }
+
+  const url = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${secretKey}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+  });
+  const data = await response.json();
+  
+  if (data.access_token) {
+    baiduAccessToken = data.access_token;
+    tokenExpiresAt = Date.now() + (data.expires_in * 1000) - 60000; // 提前一分钟刷新
+    return baiduAccessToken;
+  } else {
+    throw new Error(data.error_description || '获取百度Token失败');
+  }
+}
+
+// --- TTS Proxy Route (Baidu Cloud TTS) ---
+app.get('/api/tts/token', async (req, res) => {
+  try {
+    const token = await getBaiduToken();
+    res.json({ token });
+  } catch (error) {
+    console.error('[Baidu TTS] Token Error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/proxy/tts', async (req, res) => {
   const { text } = req.query;
   if (!text) return res.status(400).send('Text is required');
 
+  // 清理标点符号，百度 TTS 有时对特殊符号敏感
   const cleanText = text.replace(/[\s\?？\.\!！,，\(\)\（\）]/g, '').trim();
   
-  // Try /tts first, fallback to / if needed
-  const tryMelo = (path) => {
-    const url = `http://127.0.0.1:9966${path}?text=${encodeURIComponent(cleanText)}&speaker=ZH&speed=1.0`;
+  try {
+    const token = await getBaiduToken();
+    const cuid = 'wordcards_app';
     
-    http.get(url, (meloRes) => {
-      if (meloRes.statusCode === 200) {
-        console.log(`[MeloTTS] Success: "${cleanText}" (Path: ${path})`);
-        res.setHeader('Content-Type', 'audio/wav');
-        return meloRes.pipe(res);
+    const params = new URLSearchParams();
+    params.append('tex', cleanText);
+    params.append('tok', token);
+    params.append('cuid', cuid);
+    params.append('ctp', '1');
+    params.append('lan', 'zh');
+    params.append('spd', '5'); // 语速 (0-15)
+    params.append('pit', '5'); // 音调 (0-15)
+    params.append('vol', '10'); // 音量 (0-15)
+    params.append('per', '0'); // 音库：0女声，1男声，3度逍遥，4度丫丫
+
+    const postData = params.toString();
+    const options = {
+      hostname: 'tsn.baidu.com',
+      port: 443,
+      path: '/text2audio',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
       }
+    };
+
+    console.log(`[Baidu TTS] Request: "${cleanText}"`);
+
+    const baiduReq = https.request(options, (baiduRes) => {
+      const contentType = baiduRes.headers['content-type'] || '';
       
-      if (path === '/tts') {
-        // If /tts fails, try root path
-        return tryMelo('/');
+      if (contentType.includes('application/json')) {
+        let errorData = '';
+        baiduRes.on('data', chunk => errorData += chunk);
+        baiduRes.on('end', () => {
+          console.error('[Baidu TTS] API Error:', errorData);
+          res.status(500).send('Baidu TTS API Error');
+        });
       } else {
-        console.error(`[MeloTTS] All paths failed. Last status: ${meloRes.statusCode}`);
-        res.status(500).send(`MeloTTS Engine Error: ${meloRes.statusCode}`);
-      }
-    }).on('error', (err) => {
-      console.error(`[MeloTTS] Connection Error on ${path}:`, err.message);
-      if (path === '/tts') {
-        return tryMelo('/');
-      } else {
-        res.status(500).send('MeloTTS not ready. Please check "docker logs melo-tts"');
+        res.setHeader('Content-Type', 'audio/mp3');
+        baiduRes.pipe(res);
       }
     });
-  };
 
-  tryMelo('/tts');
+    baiduReq.on('error', (err) => {
+      console.error('[Baidu TTS] Connection Error:', err.message);
+      res.status(500).send('Baidu TTS Connection Error');
+    });
+
+    baiduReq.write(postData);
+    baiduReq.end();
+
+  } catch (error) {
+    console.error('[Baidu TTS] Auth/Fetch Error:', error.message);
+    res.status(500).send(error.message);
+  }
 });
 
 const PORT = process.env.PORT || 5001;
