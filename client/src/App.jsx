@@ -31,6 +31,17 @@ function App() {
       });
     });
 
+    // 全局预加载音频资源
+    const audioTypes = ['success', 'failure'];
+    const audioIndices = [1, 2, 3];
+    audioTypes.forEach(type => {
+      audioIndices.forEach(idx => {
+        const audio = new Audio();
+        audio.src = `/audio/${type}_${idx}.mp3`;
+        audio.preload = 'auto';
+      });
+    });
+
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     if (savedUser && token) {
