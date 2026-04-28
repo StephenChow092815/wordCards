@@ -7,6 +7,8 @@ services:
       - PORT=5001
       - JWT_SECRET=your_production_secret_here
       - DATABASE_URL=/app/data/database.sqlite
+      - BAIDU_API_KEY=${BAIDU_API_KEY}
+      - BAIDU_SECRET_KEY=${BAIDU_SECRET_KEY}
     volumes:
       - ./data:/app/data
     networks:
