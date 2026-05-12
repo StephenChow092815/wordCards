@@ -140,7 +140,7 @@ const Home = ({ user, onLogout }) => {
         <MenuCard
           icon={<Calculator className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
           title="算术挑战"
-          desc="5以内加减法"
+          desc="10以内加减法"
           color={theme.cardColors[4]}
           onClick={() => navigate('/math-quiz')}
         />

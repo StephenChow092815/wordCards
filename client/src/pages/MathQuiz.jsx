@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,6 +7,20 @@ import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 import { speak } from '../utils/speech';
 import FeedbackPopup from '../components/FeedbackPopup';
+
+const MAX_RESULT = 10;
+const randomInt = (max) => Math.floor(Math.random() * (max + 1));
+const randomIntInRange = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+const ZERO_PROBLEM_CHANCE = 0.15;
+const ZERO_COOLDOWN_ROUNDS = 10;
+const shuffle = (items) => {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = randomInt(i);
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
 
 const MathQuiz = () => {
   const [problem, setProblem] = useState(null);
@@ -19,30 +33,61 @@ const MathQuiz = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [feedback, setFeedback] = useState(null); // 'success' | 'error' | null
+  const zeroCooldownRef = useRef(0);
+  const operationQueueRef = useRef([]);
   
   const navigate = useNavigate();
   const { theme } = useTheme();
   const showToast = useToast();
 
-  const generateProblem = () => {
-    const isAddition = Math.random() > 0.5;
-    let a = Math.floor(Math.random() * 6); // 0-5
-    let b = Math.floor(Math.random() * 6); // 0-5
-    
+  const createOperationQueue = () => {
+    const additionCount = Math.floor(totalRounds / 2);
+    const subtractionCount = totalRounds - additionCount;
+    operationQueueRef.current = shuffle([
+      ...Array(additionCount).fill(true),
+      ...Array(subtractionCount).fill(false)
+    ]);
+  };
+
+  const generateProblem = (roundIndex = currentIndex) => {
+    const isAddition = operationQueueRef.current[roundIndex] ?? Math.random() > 0.5;
+    const allowZero = zeroCooldownRef.current === 0 && Math.random() < ZERO_PROBLEM_CHANCE;
+    let a, b;
     let question, answer;
+
     if (isAddition) {
+      if (allowZero) {
+        a = randomInt(MAX_RESULT);
+        b = randomInt(MAX_RESULT - a);
+      } else {
+        a = randomIntInRange(1, MAX_RESULT - 1);
+        b = randomIntInRange(1, MAX_RESULT - a);
+      }
       question = `${a} + ${b} = ( ) ?`;
       answer = a + b;
     } else {
-      if (a < b) [a, b] = [b, a];
+      if (allowZero) {
+        a = randomInt(MAX_RESULT);
+        b = randomInt(a);
+      } else {
+        a = randomIntInRange(2, MAX_RESULT);
+        b = randomIntInRange(1, a - 1);
+      }
       question = `${a} - ${b} = ( ) ?`;
       answer = a - b;
+    }
+
+    const hasZero = a === 0 || b === 0 || answer === 0;
+    if (hasZero) {
+      zeroCooldownRef.current = ZERO_COOLDOWN_ROUNDS;
+    } else if (zeroCooldownRef.current > 0) {
+      zeroCooldownRef.current -= 1;
     }
 
     const correct = answer;
     const distractors = new Set();
     while (distractors.size < 3) {
-      const d = Math.floor(Math.random() * 11);
+      const d = hasZero ? randomInt(MAX_RESULT) : randomIntInRange(1, MAX_RESULT);
       if (d !== correct) distractors.add(d);
     }
     
@@ -67,8 +112,11 @@ const MathQuiz = () => {
   }, [problem, hasStarted]);
 
   const handleStart = () => {
+    createOperationQueue();
+    zeroCooldownRef.current = 0;
+    setCurrentIndex(0);
     setHasStarted(true);
-    generateProblem();
+    generateProblem(0);
   };
 
   const handleAnswer = async (option) => {
@@ -100,8 +148,9 @@ const MathQuiz = () => {
       if (currentIndex < totalRounds - 1) {
         setIsTransitioning(true);
         setTimeout(() => {
-          setCurrentIndex(prev => prev + 1);
-          generateProblem();
+          const nextIndex = currentIndex + 1;
+          setCurrentIndex(nextIndex);
+          generateProblem(nextIndex);
           setIsTransitioning(false);
         }, 300);
       } else {
